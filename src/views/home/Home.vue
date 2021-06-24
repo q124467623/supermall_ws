@@ -1,13 +1,44 @@
 <template>
 <div id="home">
-  <nav-bar class="home-nav">
-    <div slot="center">购物街</div>
-  </nav-bar>
-  <home-swiper :cbanners="banners"/>
-  <home-recommend-view :crecommends="recommends"/>
-  <home-feature-view/>
-  <tab-control class="tab-control" :ctitles="titles" @tabClick="tabClick"/>
-  <goods-list :cgoods="showGoods"/>
+  <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
+  <scroll class="content"
+    :cprobe-type="3"
+    :cpull-up-load="true"
+    @scroll="scrollPosition"
+    ref="scroll"
+    @pullingUp="loadMore">
+    <home-swiper :cbanners="banners"/>
+    <home-recommend-view :crecommends="recommends"/>
+    <home-feature-view/>
+    <tab-control class="tab-control" :ctitles="titles" @tabClick="tabClick"/>
+    <goods-list :cgoods="showGoods"/>
+  </scroll>
+  <back-top class="back-top" v-show="isShowBack" @click.native="backClick"></back-top>
+  <div>呵呵呵呵</div>
+
+    <!-- <ul>
+      <li>1</li>
+      <li>2</li>
+      <li>3</li>
+      <li>4</li>
+      <li>5</li>
+      <li>6</li>
+      <li>7</li>
+      <li>8</li>
+      <li>9</li>
+      <li>10</li>
+      <li>11</li>
+      <li>12</li>
+      <li>13</li>
+      <li>14</li>
+      <li>15</li>
+      <li>16</li>
+      <li>17</li>
+      <li>18</li>
+      <li>19</li>
+      <li>20</li>
+    </ul> -->
+
 </div>
 </template>
 
@@ -19,9 +50,11 @@ import HomeFeatureView from '@/views/home/childComps/HomeFeatureView'
 import NavBar from '@/components/common/navbar/NavBar'
 import TabControl from '@/components/content/tabControl/TabControl'
 import GoodsList from '@/components/content/goods/GoodsList'
-
+import BackTop from '@/components/content/backTop/BackTop'
 
 import { getHomeMultifata, getHomeGoods } from '@/network/home'
+
+import Scroll from '@/components/common/scroll/Scroll'
 
 export default {
     name:'Home',
@@ -31,7 +64,9 @@ export default {
       HomeFeatureView,
       NavBar,
       TabControl,
-      GoodsList
+      GoodsList,
+      BackTop,
+      Scroll
     },
     data(){
       return {
@@ -44,6 +79,7 @@ export default {
           'sell':{page:0,list:[]},
         },
         currentType:'pop',
+        position:{},
       }
     },
     created(){
@@ -57,11 +93,14 @@ export default {
     computed:{
       showGoods(){
         return this.goods[this.currentType].list
+      },
+      isShowBack(){
+        return this.position.y < -1000
       }
     },
     methods:{
       /**
-       * 时间监听相关方法
+       * 事件监听相关方法
        */
       tabClick(index){
         switch (index) {
@@ -75,6 +114,11 @@ export default {
             this.currentType ='sell'
             break;
         }
+      },
+      loadMore(){
+        // console.log("加载更多");
+        this.getHomeGoods(this.currentType)
+        this.$refs.scroll.finishPullUp()
       },
       /**
        * 网络请求相关方法
@@ -92,6 +136,13 @@ export default {
           this.goods[type].page += 1
         })
       },
+      scrollPosition(position){
+        this.position = position
+      },
+      backClick(){
+        // console.log(this.$refs.scroll.scroll);
+        this.$refs.scroll.scrollTo(0,0)
+      },
 
     }
 
@@ -100,13 +151,14 @@ export default {
 
 <style scoped>
 #home{
-  /* height: 100vh; */
-  /* position: relative; */
-  padding-top: 44px;
+  height: 100vh;/*vh是视口的高度*/
+  position: relative;
+
 }
 .home-nav {
   background-color: var(--color-tint);
   color: white;
+
   position: fixed;
   top: 0;
   left: 0;
@@ -116,8 +168,15 @@ export default {
 .tab-control{
   position: sticky;
   top: 44px;
-  background-color: #fff;
+  /* background-color: #fff; */
   z-index: 9;
-
+}
+.content{
+  overflow: hidden;
+  position: absolute;
+  top: 44px;
+  bottom: 49px;
+  left: 0;
+  right: 0;
 }
 </style>
