@@ -17,12 +17,10 @@ export default {
         type:Number,
         default: 0
       },
-      cpullUpLoad:{
-        type:Boolean,
-        default(){
-          return false
-        }
-      },
+      // cpullUpLoad:{
+      //   type:Boolean,
+      //   default:false
+      // },
     },
     data(){
       return {
@@ -34,7 +32,7 @@ export default {
         this.scroll = new BScroll(this.$refs.wrapper,{
           click:true,
           probeType:this.cprobeType,
-          pullUpLoad:this.cpullUpLoad,
+          // pullUpLoad:this.cpullUpLoad,
           mouseWheel:true,
           observeDOM:true
         })
@@ -43,11 +41,12 @@ export default {
           // console.log(position);
           this.$emit('scroll',position)
         })
+        this.scroll.refresh();
+        console.log(this.scroll);
         //3.监听上拉事件
-        this.scroll.on('pullingUp',()=>{
-          // console.log("上拉加载更多");
-          this.$emit('pullingUp')
-        })
+        // this.scroll.on('pullingUp',()=>{
+        //   this.$emit('pullingUp')
+        // })
     },
     methods:{
       scrollTo(x,y,time=500){
@@ -55,6 +54,9 @@ export default {
       },
       finishPullUp(){
         this.scroll.finishPullUp()
+      },
+      refresh(){
+        this.scroll.refresh()
       }
     }
 }

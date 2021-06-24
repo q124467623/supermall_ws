@@ -5,8 +5,7 @@
     :cprobe-type="3"
     :cpull-up-load="true"
     @scroll="scrollPosition"
-    ref="scroll"
-    @pullingUp="loadMore">
+    ref="scroll">
     <home-swiper :cbanners="banners"/>
     <home-recommend-view :crecommends="recommends"/>
     <home-feature-view/>
@@ -89,6 +88,11 @@ export default {
       this.getHomeGoods('pop')
       this.getHomeGoods('new')
       this.getHomeGoods('sell')
+      //3.监听item图片加载完成
+      this.$bus.$on('itemImageLoad',()=>{
+        // console.log("-------");
+        this.$refs.scroll.refresh()
+      })
     },
     computed:{
       showGoods(){
@@ -115,11 +119,11 @@ export default {
             break;
         }
       },
-      loadMore(){
-        // console.log("加载更多");
-        this.getHomeGoods(this.currentType)
-        this.$refs.scroll.finishPullUp()
-      },
+      // loadMore(){
+      //   // console.log("加载更多");
+      //   this.getHomeGoods(this.currentType)
+      //   this.$refs.scroll.finishPullUp()
+      // },
       /**
        * 网络请求相关方法
        */
