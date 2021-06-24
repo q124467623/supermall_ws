@@ -17,10 +17,10 @@ export default {
         type:Number,
         default: 0
       },
-      // cpullUpLoad:{
-      //   type:Boolean,
-      //   default:false
-      // },
+      cpullUpLoad:{
+        type:Boolean,
+        default:false
+      },
     },
     data(){
       return {
@@ -32,7 +32,7 @@ export default {
         this.scroll = new BScroll(this.$refs.wrapper,{
           click:true,
           probeType:this.cprobeType,
-          // pullUpLoad:this.cpullUpLoad,
+          pullUpLoad:this.cpullUpLoad,
           mouseWheel:true,
           observeDOM:true
         })
@@ -41,23 +41,25 @@ export default {
           // console.log(position);
           this.$emit('scroll',position)
         })
-        this.scroll.refresh();
-        console.log(this.scroll);
         //3.监听上拉事件
-        // this.scroll.on('pullingUp',()=>{
-        //   this.$emit('pullingUp')
-        // })
+        if(this.cpullUpLoad){
+          this.scroll.on('pullingUp',()=>{
+            console.log("aaa");
+            this.$emit('pullingUp')
+        })
+        }
     },
     methods:{
       scrollTo(x,y,time=500){
         this.scroll.scrollTo(x,y,time)
       },
       finishPullUp(){
-        this.scroll.finishPullUp()
+        this.scroll&&this.scroll.finishPullUp()
       },
       refresh(){
+        console.log("*********");
         this.scroll.refresh()
-      }
+      },
     }
 }
 </script>

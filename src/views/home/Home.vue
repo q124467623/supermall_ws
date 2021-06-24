@@ -5,6 +5,7 @@
     :cprobe-type="3"
     :cpull-up-load="true"
     @scroll="scrollPosition"
+    @pullingUp="loadMore"
     ref="scroll">
     <home-swiper :cbanners="banners"/>
     <home-recommend-view :crecommends="recommends"/>
@@ -52,6 +53,7 @@ import GoodsList from '@/components/content/goods/GoodsList'
 import BackTop from '@/components/content/backTop/BackTop'
 
 import { getHomeMultifata, getHomeGoods } from '@/network/home'
+import {debounce} from '@/common/utils'
 
 import Scroll from '@/components/common/scroll/Scroll'
 
@@ -89,9 +91,18 @@ export default {
       this.getHomeGoods('new')
       this.getHomeGoods('sell')
       //3.监听item图片加载完成
+      // this.$bus.$on('itemImageLoad',()=>{
+      //   // console.log("-------");//会打印30次，考虑采用防抖
+      //   this.$refs.scroll.refresh()
+      // })
+    },
+    mounted(){
+      const refresh = debounce(this.$refs.scroll.refresh,500)
       this.$bus.$on('itemImageLoad',()=>{
-        // console.log("-------");
-        this.$refs.scroll.refresh()
+        refresh() //这里会执行30次，只是返回30次函数（函数内部有refresh），
+        //每个函数内部的函数在执行的时候会延迟500毫秒，如果下一次执行小于500毫秒，就把上次的延迟函数清空掉
+        console.log("-------");//之前会打印30次，考虑采用防抖
+        // this.$refs.scroll.refresh()
       })
     },
     computed:{
@@ -106,6 +117,16 @@ export default {
       /**
        * 事件监听相关方法
        */
+      //如果下一章图片请求时间在delay之内，则func还没执行就被清空了，因此不刷新
+      // debounce(func,delay){
+      //   let timer = null;
+      //   return function(...args){
+      //     if(timer) clearTimeout(timer)
+      //     timer = setTimeout(() => {
+      //       func.apply(this,args)
+      //     }, delay);
+      //   }
+      // },
       tabClick(index){
         switch (index) {
           case 0:
@@ -119,11 +140,10 @@ export default {
             break;
         }
       },
-      // loadMore(){
-      //   // console.log("加载更多");
-      //   this.getHomeGoods(this.currentType)
-      //   this.$refs.scroll.finishPullUp()
-      // },
+      loadMore(){
+        // console.log("加载更多");
+        this.getHomeGoods(this.currentType)
+      },
       /**
        * 网络请求相关方法
        */
@@ -138,6 +158,8 @@ export default {
         getHomeGoods(type,page).then(res=>{
           this.goods[type].list.push(...res.data.list)
           this.goods[type].page += 1
+          //完成上拉加载更多
+          this.$refs.scroll.finishPullUp()
         })
       },
       scrollPosition(position){
