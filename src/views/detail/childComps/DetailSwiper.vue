@@ -1,19 +1,18 @@
 <template>
-    <swiper>
-      <swiper-item v-for="(item,index) in cbanners" :key="index">
-        <a :href="item.link">
-          <img :src="item.image" alt="" @load="imageLoad">
-        </a>
-      </swiper-item>
+  <swiper class="swiper-item">
+    <swiper-item  v-for="(item,index) in ctopImages" :key="index">
+      <img :src="item" alt="">
+    </swiper-item>
   </swiper>
 </template>
 
 <script>
 import {Swiper , SwiperItem} from '@/components/common/swiper'
+
 export default {
-  name:'HomeSwiper',
+  name:'DetailSwiper',
   props:{
-    cbanners:{
+    ctopImages:{
       type:Array,
       default(){
         return []
@@ -32,12 +31,19 @@ export default {
   methods:{
     imageLoad(){
       if(!this.isLoad){
-        this.$emit('swiperImageLoad')
-        this.isLoad = true
+        // this.$emit('swiperImageLoad')
+        // this.isLoad = true
       }
     }
   }
 }
 </script>
+
+<style scoped>
+.swiper-item{
+  height: 300px;
+  overflow: hidden;
+}
+</style>
 
 
