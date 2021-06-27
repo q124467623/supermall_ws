@@ -34,7 +34,7 @@
       imgLoaded(){
         //图片加载完之后发出消息
         if(++this.counter ===this.imagesLength){
-          this.$emit('imageLoad')
+          this.$emit('detailImageLoad')
         }
       }
     },

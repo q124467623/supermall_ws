@@ -29,7 +29,7 @@ import GoodsList from '@/components/content/goods/GoodsList'
 import BackTop from '@/components/content/backTop/BackTop'
 
 import { getHomeMultidata, getHomeGoods } from '@/network/home'
-import {debounce} from '@/common/utils'
+import {itemListenerMixin} from '@/common/mixin'
 
 import Scroll from '@/components/common/scroll/Scroll'
 
@@ -45,6 +45,7 @@ export default {
       BackTop,
       Scroll,
     },
+    mixins:[itemListenerMixin],
     data(){
       return {
         banners:[],
@@ -76,15 +77,13 @@ export default {
       // })
     },
     mounted(){
-      //1.图片加载完成的时间监听
-      const refresh = debounce(this.$refs.scroll.refresh,500)
-      this.$bus.$on('itemImageLoad',()=>{
-        refresh() //这里会执行30次，只是返回30次函数（函数内部有refresh），
-        //每个函数内部的函数在执行的时候会延迟500毫秒，如果下一次执行小于500毫秒，就把上次的延迟函数清空掉
-        // console.log("-------");//之前会打印30次，考虑采用防抖
-        // this.$refs.scroll.refresh()
-      })
-
+      //1.图片加载完成的时间监听（方法1，根据名字判断）
+      // const refresh = debounce(this.$refs.scroll.refresh,100)
+      // this.$bus.$on('homeItemImageLoad',()=>{
+      //   refresh() //这里会执行30次，只是返回30次函数（函数内部有refresh），
+      // })
+      //
+      //1.图片加载完成的时间监听（方法2，Mixin）
     },
     computed:{
       showGoods(){

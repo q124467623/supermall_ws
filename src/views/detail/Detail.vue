@@ -1,17 +1,14 @@
 <template>
     <div id="detail">
-      <detail-nav-bar class="detail-nav"/>
-      <scroll class="content" refs="scroll">
-        <div class="wrapper">
-          <detail-swiper :ctopImages="topImages" />
-          <detail-base-info :goods="goods"/>
-          <detail-shop-info :shop="shop"/>
-          <detail-goods-info :detailInfo="detailInfo"/>
-          <detail-param-info :paramInfo="paramInfo"/>
-          <detail-comment-info :commentInfo="commentInfo" ref="comment"/>
-          <!-- <detail-recommend-info :recommendList="recommendList"/> -->
-          <goods-list :cgoods="recommends"/>
-        </div>
+      <detail-nav-bar class="detail-nav" @titleClick="titleClick" ref="navbar"/>
+      <scroll class="content" ref="scroll" :cprobe-type="3" @scroll="contentScroll">
+        <detail-swiper :ctop-images="topImages" />
+        <detail-base-info :goods="goods"/>
+        <detail-shop-info :shop="shop"/>
+        <detail-goods-info :detail-info="detailInfo" @detailImageLoad="detailImageLoad"/>
+        <detail-param-info :param-info="paramInfo" ref="param"/>
+        <detail-comment-info :comment-info="commentInfo" ref="comment"/>
+        <goods-list :cgoods="recommends" ref="recommend"/>
       </scroll>
     </div>
 </template>
@@ -30,9 +27,13 @@ import Scroll from '@/components/common/scroll/Scroll'
 import GoodsList from '@/components/content/goods/GoodsList'
 
 import {getDetail,Goods,Shop,GoodsParam,getRecommend} from '@/network/detail'
+import {itemListenerMixin} from '@/common/mixin'
+
+
 
 export default {
     name:'Detail',
+    mixins:[itemListenerMixin],
     components:{
       DetailNavBar,
       DetailSwiper,
@@ -54,7 +55,9 @@ export default {
         detailInfo:{},
         paramInfo:{},
         commentInfo:{},
-        recommends:[]
+        recommends:[],
+        themeTopYs:[],
+        currentIndex:0
       }
     },
     created(){
@@ -78,20 +81,69 @@ export default {
           this.commentInfo = res.result.rate.list[0]
           // console.log(this.commentInfo);
         }
+        //9.点击标题滚到响应内容
+          //9.1在这里this.$refs.param.$el.offsetTop是不对的，因为仅仅获取到数据，还没渲染
+        // this.$nextTick(()=>{
+          //9.2在这里获取的值也不对，图片没有计算在内
+          //根据最新的数据，对应的DOM是已经被渲染出来
+          //但是图片依然是没有加载完（offsetTop值偏小）
+        // })
       }).catch((err) => {
         console.log(err)
       });
       //请求推荐数据
-      getRecommend().then((res, error) => {
-          // if (error) return
+      getRecommend().then((res, error) => {      
           this.recommends = res.data.list;
-          // console.log(this.recommends);
       })
     },
     methods:{
-      imageLoad(){
+      //1.法1防抖，在DeatilGoodsList设置++this.counter ===this.imagesLength再发出事件
+      detailImageLoad(){
         this.$refs.scroll.refresh()
-      }
+        this.themeTopYs = [];
+        this.themeTopYs.push(44);
+        this.themeTopYs.push(this.$refs.param.$el.offsetTop);
+        this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
+        this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
+      },
+      //2.法2防抖，Mixin内有防抖函数
+      // detailImageLoad(){
+      //   this.newRefresh()
+      // }
+      titleClick(index){
+        this.$refs.scroll.scrollTo(0,-this.themeTopYs[index]+44,500)
+      },
+      contentScroll(position){
+        // console.log(this.themeTopYs);
+        // console.log(-position.y);
+        //方法1：普通方法
+        // this.themeTopYs.forEach((item,index) =>{
+          // if((this.currentIndex !== index)&&((index<this.themeTopYs.length-1&&-position.y>=item&&-position.y<this.themeTopYs[index+1])||(index===this.themeTopYs.length-1&&-position.y>=item))){
+          //   this.currentIndex = index;
+          //   console.log(this.currentIndex);
+          //   this.$refs.navbar.currentIndex = this.currentIndex
+          // }
+        // })
+        //方法2：this.themeTopYs.push(Number.MAX_VALUE)
+        this.themeTopYs.push(Number.MAX_VALUE);
+        let length = this.themeTopYs.length;
+        for(let i=0;i<length-1;i++){
+          if((this.currentIndex !== i)&&(-position.y>=this.themeTopYs[i]&&-position.y<this.themeTopYs[i+1])){
+            this.currentIndex = i;
+            this.$refs.navbar.currentIndex = this.currentIndex
+          }
+        }
+
+ 
+      },
+    },
+    mounted(){
+      //1.图片加载完成的时间监听
+      // const refresh = debounce(this.$refs.scroll.refresh,100)
+      // this.$bus.$on('detailItemImageLoad',()=>{
+      //   refresh() //这里会执行24次，只是返回24次函数（函数内部有refresh），
+      // })
+      //2.图片加载完成的时间监听（方法2：Mixin）
     }
 }
 </script>

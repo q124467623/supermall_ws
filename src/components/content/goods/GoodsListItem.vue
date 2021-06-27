@@ -27,10 +27,19 @@ export default {
   },
   methods:{
     imageLoad(){
+      //方法1发出： this.$bus.$emit('itemImageLoad')
+      // 方法1接收:this.$bus.on('itemImageLoad',()=>{debounce(this.$refs.scroll.refresh,100)})
       this.$bus.$emit('itemImageLoad')
+      //方法2：
+      // if(this.$route.path.indexOf('/home')>-1){
+      //   this.$bus.$emit('homeItemImageLoad')
+      // }else if(this.$route.path.indexOf('/detail')>-1){
+      //   this.$bus.$emit('detailItemImageLoad')
+      // }
     },
     itemClick(){
-      // console.log(this.goodsItem.link);
+      // console.log(this.$router);
+      // console.log(this.goodsItem.iid);
       this.$router.push('/detail/'+this.goodsItem.iid)
     }
   }
