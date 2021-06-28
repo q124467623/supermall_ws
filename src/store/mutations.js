@@ -8,7 +8,6 @@ export default {
     console.log("payload.count++ :",payload.count);
   },
   [ADD_TO_CART](state,payload){
-    payload.count = 1
     state.cartList.push(payload)
   }
 }
