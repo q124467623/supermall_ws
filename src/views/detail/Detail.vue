@@ -10,7 +10,7 @@
         <detail-comment-info :comment-info="commentInfo" ref="comment"/>
         <goods-list :cgoods="recommends" ref="recommend"/>
       </scroll>
-      <detail-bottom-bar class="detail-bottom" @addCart="addCart"/>
+      <detail-bottom-bar class="detail-bottom" @addCart="addToCart"/>
       <back-top class="back-top" v-show="isShowBackTop" @click.native="backClick"></back-top>
     </div>
 </template>
@@ -62,7 +62,6 @@ export default {
         recommends:[],
         themeTopYs:[],
         currentIndex:0,
-        count:0
         // isShowBackTop:false
       }
     },
@@ -142,7 +141,7 @@ export default {
         //3.判断BackTop是否显示
         this.listenShowBackTop(position)
       },
-      addCart(){
+      addToCart(){
         //1.只获取购物车中需要展示的信息：图片、标题、描述、价格、数量
         const product = {}
         product.image = this.topImages[0]
@@ -150,8 +149,11 @@ export default {
         product.desc = this.goods.desc
         product.realPrice = this.goods.realPrice
         product.iid = this.iid
+        // product.count = 0
+        // console.log(product);
         //2.将商品添加到购物车里
-        this.$store.commit('addCart',product)
+        // this.$store.commit('addCart',product)
+        this.$store.dispatch('addCart',product)
       }
     },
     mounted(){
