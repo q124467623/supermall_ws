@@ -1,8 +1,8 @@
 <template>
     <div id="detail">
       <detail-nav-bar class="detail-nav" @titleClick="titleClick" ref="navbar"/>
-      <scroll class="content" ref="scroll" :cprobe-type="3" @scroll="contentScroll">
-        <detail-swiper :ctop-images="topImages" />
+      <scroll class="content" ref="scroll" :cprobe-type="3" @scroll="scrollPosition">
+        <detail-swiper :ctop-images="topImages"/>
         <detail-base-info :goods="goods"/>
         <detail-shop-info :shop="shop"/>
         <detail-goods-info :detail-info="detailInfo" @detailImageLoad="detailImageLoad"/>
@@ -10,6 +10,8 @@
         <detail-comment-info :comment-info="commentInfo" ref="comment"/>
         <goods-list :cgoods="recommends" ref="recommend"/>
       </scroll>
+      <detail-bottom-bar class="detail-bottom" @addCart="addCart"/>
+      <back-top class="back-top" v-show="isShowBackTop" @click.native="backClick"></back-top>
     </div>
 </template>
 
@@ -22,18 +24,19 @@ import DetailGoodsInfo from '@/views/detail/childComps/DetailGoodsInfo'
 import DetailParamInfo from '@/views/detail/childComps/DetailParamInfo'
 import DetailCommentInfo from '@/views/detail/childComps/DetailCommentInfo'
 import DetailRecommendInfo from '@/views/detail/childComps/DetailRecommendInfo'
+import DetailBottomBar from '@/views/detail/childComps/DetailBottomBar'
 
 import Scroll from '@/components/common/scroll/Scroll'
 import GoodsList from '@/components/content/goods/GoodsList'
 
 import {getDetail,Goods,Shop,GoodsParam,getRecommend} from '@/network/detail'
-import {itemListenerMixin} from '@/common/mixin'
+import {itemListenerMixin,backTopMixin} from '@/common/mixin'
 
 
 
 export default {
     name:'Detail',
-    mixins:[itemListenerMixin],
+    mixins:[itemListenerMixin,backTopMixin],
     components:{
       DetailNavBar,
       DetailSwiper,
@@ -44,7 +47,8 @@ export default {
       Scroll,
       GoodsList,
       DetailCommentInfo,
-      DetailRecommendInfo
+      DetailRecommendInfo,
+      DetailBottomBar,
     },
     data(){
       return {
@@ -57,7 +61,9 @@ export default {
         commentInfo:{},
         recommends:[],
         themeTopYs:[],
-        currentIndex:0
+        currentIndex:0,
+        count:0
+        // isShowBackTop:false
       }
     },
     created(){
@@ -92,7 +98,7 @@ export default {
         console.log(err)
       });
       //请求推荐数据
-      getRecommend().then((res, error) => {      
+      getRecommend().then((res, error) => {
           this.recommends = res.data.list;
       })
     },
@@ -113,7 +119,7 @@ export default {
       titleClick(index){
         this.$refs.scroll.scrollTo(0,-this.themeTopYs[index]+44,500)
       },
-      contentScroll(position){
+      scrollPosition(position){
         // console.log(this.themeTopYs);
         // console.log(-position.y);
         //方法1：普通方法
@@ -133,9 +139,20 @@ export default {
             this.$refs.navbar.currentIndex = this.currentIndex
           }
         }
-
- 
+        //3.判断BackTop是否显示
+        this.listenShowBackTop(position)
       },
+      addCart(){
+        //1.只获取购物车中需要展示的信息：图片、标题、描述、价格、数量
+        const product = {}
+        product.image = this.topImages[0]
+        product.title = this.goods.title
+        product.desc = this.goods.desc
+        product.realPrice = this.goods.realPrice
+        product.iid = this.iid
+        //2.将商品添加到购物车里
+        this.$store.commit('addCart',product)
+      }
     },
     mounted(){
       //1.图片加载完成的时间监听
@@ -161,6 +178,6 @@ export default {
   background-color: #fff;
 }
 .content{
-  height: calc(100% - 44px);
+  height: calc(100% - 101px);
 }
 </style>

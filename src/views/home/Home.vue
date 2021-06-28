@@ -22,14 +22,12 @@
 import HomeSwiper from '@/views/home/childComps/HomeSwiper'
 import HomeRecommendView from './childComps/HomeRecommendView'
 import HomeFeatureView from '@/views/home/childComps/HomeFeatureView'
-
 import NavBar from '@/components/common/navbar/NavBar'
 import TabControl from '@/components/content/tabControl/TabControl'
 import GoodsList from '@/components/content/goods/GoodsList'
-import BackTop from '@/components/content/backTop/BackTop'
 
 import { getHomeMultidata, getHomeGoods } from '@/network/home'
-import {itemListenerMixin} from '@/common/mixin'
+import {itemListenerMixin,backTopMixin} from '@/common/mixin'
 
 import Scroll from '@/components/common/scroll/Scroll'
 
@@ -42,10 +40,9 @@ export default {
       NavBar,
       TabControl,
       GoodsList,
-      BackTop,
       Scroll,
     },
-    mixins:[itemListenerMixin],
+    mixins:[itemListenerMixin , backTopMixin],
     data(){
       return {
         banners:[],
@@ -57,7 +54,7 @@ export default {
           'sell':{page:0,list:[]},
         },
         currentType:'pop',
-        isShowBackTop:false,
+        // isShowBackTop:false,
         tabOffsetTOP:0,
         isTabFixed:false,
         saveY:0
@@ -145,13 +142,9 @@ export default {
       },
       scrollPosition(position){
         //1.判断BackTop是否显示
-        this.isShowBackTop = position.y < -1000
+        this.listenShowBackTop(position)
         //2.决定tabControl是否吸顶（position:fixed）
         this.isTabFixed = -position.y>this.tabOffsetTOP
-      },
-      backClick(){
-        // console.log(this.$refs.scroll.scroll);
-        this.$refs.scroll.scrollTo(0,0)
       },
       swiperImageLoad(){
         //1.判断Back
