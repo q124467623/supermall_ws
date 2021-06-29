@@ -28,6 +28,7 @@ export default {
   background-color: red;
   height: 40px;
   position: relative;
+  bottom: 44px;
 }
 .check-content{
   display: flex;

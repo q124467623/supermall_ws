@@ -50,6 +50,7 @@ export default {
   z-index: 9;
 }
 .content{
-  height: calc(100%-93px);
+  /* height: calc(100%-93px); */
+  height: 719px;
 }
 </style>
