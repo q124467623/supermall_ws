@@ -1,16 +1,55 @@
 <template>
-    <div>
-      <h2>购物车</h2>
-    <div>{{$store.state.cartList.length}}</div>
+    <div class="cart">
+      <!-- 购物车 -->
+      <nav-bar class="nav-bar">
+        <div slot="center">购物车({{cartLength}})</div>
+      </nav-bar>
+      <!-- 商品列表 -->
+      <scroll class="content" ref="scroll">
+         <cart-list/>
+      </scroll>
+      <!-- 底部汇总 -->
+      <cart-bottom-bar class="cartbottom"/>
     </div>
 </template>
 
 <script>
+import NavBar from '@/components/common/navbar/NavBar'
+import CartList from '@/views/cart/childComps/CartList'
+
+import {mapGetters} from 'vuex'
+import Scroll from '@/components/common/scroll/Scroll'
+import CartBottomBar from './childComps/CartBottomBar'
+
 export default {
-    name:'Cart'
+    name:'Cart',
+    components:{
+      NavBar,
+      CartList,
+      Scroll,
+      CartBottomBar,
+    },
+    computed:{
+      ...mapGetters(['cartLength'])
+    },
+    activated(){
+      this.$refs.scroll.refresh()
+    }
 }
 </script>
 
 <style scoped>
-
+.cart{
+  height: 100vh;
+}
+.nav-bar{
+  position: relative;
+  background-color: var(--color-tint);
+  color: rgb(255, 255, 255);
+  font-weight: 700;
+  z-index: 9;
+}
+.content{
+  height: calc(100%-93px);
+}
 </style>
