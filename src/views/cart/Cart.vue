@@ -41,6 +41,7 @@ export default {
 <style scoped>
 .cart{
   height: 100vh;
+  position: relative;
 }
 .nav-bar{
   position: relative;
@@ -50,7 +51,18 @@ export default {
   z-index: 9;
 }
 .content{
-  /* height: calc(100%-93px); */
-  height: 719px;
+  position: absolute;
+  top: 44px;
+  bottom: 89px;
+  left: 0;
+  right: 0;
+  overflow: hidden;
+}
+.cartbottom{
+  position: absolute;
+  bottom: 49px;
+  left: 0;
+  right: 0;
+  z-index: 9;
 }
 </style>

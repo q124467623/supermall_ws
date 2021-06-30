@@ -12,6 +12,7 @@
       </scroll>
       <detail-bottom-bar class="detail-bottom" @addCart="addToCart"/>
       <back-top class="back-top" v-show="isShowBackTop" @click.native="backClick"></back-top>
+      <toast :message="message" :isShow="isShow"/>
     </div>
 </template>
 
@@ -32,7 +33,8 @@ import GoodsList from '@/components/content/goods/GoodsList'
 import {getDetail,Goods,Shop,GoodsParam,getRecommend} from '@/network/detail'
 import {itemListenerMixin,backTopMixin} from '@/common/mixin'
 
-
+import { mapActions } from 'vuex'
+import Toast from '@/components/common/toast/Toast'
 
 export default {
     name:'Detail',
@@ -49,6 +51,8 @@ export default {
       DetailCommentInfo,
       DetailRecommendInfo,
       DetailBottomBar,
+      Toast,
+
     },
     data(){
       return {
@@ -62,7 +66,8 @@ export default {
         recommends:[],
         themeTopYs:[],
         currentIndex:0,
-        // isShowBackTop:false
+        message:'',
+        isShow:false
       }
     },
     created(){
@@ -102,6 +107,7 @@ export default {
       })
     },
     methods:{
+      ...mapActions(['addCart']),
       //1.法1防抖，在DeatilGoodsList设置++this.counter ===this.imagesLength再发出事件
       detailImageLoad(){
         this.$refs.scroll.refresh()
@@ -152,8 +158,22 @@ export default {
         // product.count = 0
         // console.log(product);
         //2.将商品添加到购物车里
-        // this.$store.commit('addCart',product)
-        this.$store.dispatch('addCart',product)
+        // this.$store.commit('addCart',product)  //传到mutations中
+        //法一，传统方法：
+        // this.$store.dispatch('addCart',product)
+        // .then(res=>{
+        //   console.log(res);
+        // })
+        //法二，映射方法
+        this.addCart(product).then(res => {
+          this.message = res;
+          this.isShow = true;
+          setTimeout(() => {
+            this.isShow = false;
+            this.message = '';
+          }, 1000);
+        })
+
       }
     },
     mounted(){
