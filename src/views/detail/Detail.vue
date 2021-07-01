@@ -166,12 +166,14 @@ export default {
         // })
         //法二，映射方法
         this.addCart(product).then(res => {
-          this.message = res;
-          this.isShow = true;
-          setTimeout(() => {
-            this.isShow = false;
-            this.message = '';
-          }, 1000);
+          // this.message = res;
+          // this.isShow = true;
+          // setTimeout(() => {
+          //   this.isShow = false;
+          //   this.message = '';
+          // }, 1000);
+          // console.log(this.$toast);
+          this.$toast.show(res,2000)
         })
 
       }

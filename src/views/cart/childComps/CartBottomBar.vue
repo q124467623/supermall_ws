@@ -5,7 +5,7 @@
       <span>全选</span>
     </div>
     <div class="total-price">合计:￥ {{totalPrice}}</div>
-    <div class="calculate">去计算({{checkLength}})
+    <div class="calculate" @click="calcClick">去计算({{checkLength}})
     </div>
   </div>
 </template>
@@ -32,6 +32,11 @@ export default {
         this.cartList.forEach(item =>{item.checked = true})
       }
     },
+    calcClick(){
+      if(!this.checkLength){
+        this.$toast.show('请选择购买商品',2000)
+      }
+    }
   },
   computed:{
     ...mapGetters(['cartLength','cartList']),
@@ -61,7 +66,7 @@ export default {
         // this.isAllChecked =  !this.cartList.some(item => {return !item.checked})
         return this.checkLength === this.cartList.length? true:false
       }
-    }
+    },
   },
 
 }
